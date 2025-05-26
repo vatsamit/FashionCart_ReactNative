@@ -21,8 +21,10 @@ const Header = ({ isCart }) => {
         }
         
 
-         <Image source={require('../assets/dp.png')} style={styles.dp} />
-        </View>
+        <TouchableOpacity onPress={() => navigation.navigate('ACCOUNT')}>
+          <Image source={{ uri: 'https://randomuser.me/api/portraits/men/1.jpg'}} style={styles.dp} />
+        </TouchableOpacity>
+      </View>
   )
 }
 
