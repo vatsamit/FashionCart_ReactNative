@@ -18,7 +18,7 @@ const Login = () => {
       return;
     }
     try {
-      const response = await fetch('https://backendformobileapp-6.onrender.com/api/auth/login', {
+      const response = await fetch('https://backendformobileapp-7.onrender.com/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

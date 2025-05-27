@@ -25,7 +25,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await fetch('https://backendformobileapp-6.onrender.com/api/auth/signup', {
+      const response = await fetch('https://backendformobileapp-7.onrender.com/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
