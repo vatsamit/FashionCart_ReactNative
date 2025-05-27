@@ -73,7 +73,14 @@ const AuthStackScreen = () => (
 );
 
 const MainApp = () => {
-  const { isLoggedIn } = useContext(AuthContext);
+  const { isLoggedIn, loading } = useContext(AuthContext);
+
+  if (loading) {
+    // You can show a splash, spinner, or just return null
+    return null;
+    // Or for a spinner:
+    // return <ActivityIndicator size="large" color="#E96E6E" style={{flex:1, justifyContent:'center', alignItems:'center'}} />;
+  }
 
   return (
     <NavigationContainer>

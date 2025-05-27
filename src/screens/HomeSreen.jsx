@@ -1,4 +1,3 @@
-
 import { View, Text, StyleSheet, TextInput, FlatList } from 'react-native'
 import React ,{useState} from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -8,82 +7,83 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import Category from '../component/Category';
 import ProductCard from '../component/ProductCard';
 import data from '../data/data.json'; 
+import { Animated } from 'react-native';
 
 
 const Categories= ['Trending Now' ,'All' , 'New' ,'Men' ,'Women']
 
 const HomeSreen = () => {
-    const [products ,setProducts]=useState(data.products)
+    const [products, setProducts] = useState(data.products);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [isLiked, setIsLiked] = useState(false);
+    const [searchText, setSearchText] = useState('');
 
-    const handleLiked = (item)=>{
-        const newProducts = products.map((prod)=>{
-            if(prod.id === item.id){
-                return{
+    const handleLiked = (item) => {
+        const newProducts = products.map((prod) => {
+            if (prod.id === item.id) {
+                return {
                     ...prod,
-                    isLiked:true,
+                    isLiked: true,
                 }
             }
             return prod;
         })
         setProducts(newProducts);
-    }
-  return (
-    <LinearGradient colors={['#FDF0F3', '#FFFBFC']} 
-    style={styles.container}>
-   <Header/>
-  
-  {/* Product List */}
-   
-    <FlatList 
-    numColumns={2}
-    ListHeaderComponent={
-        <>
-        <Text style={styles.matchText}>Match Your Style</Text>
-            {/* input container */}
-        <View style={styles.inputContainer}>
-    <View style={styles.iconContainer}>
-   <Fontisto name="search" size={26} color="#C0C0C0" />
-    </View>
-    
-    <TextInput style={styles.textInput} placeholder='Search'/>
+    };
 
-   </View>
-         {/* Category Container */}
-   <FlatList 
-   data={Categories}
-  renderItem={({ item }) => (
-    <Category
-      item={item}
-      selectedCategory={selectedCategory}
-      setSelectedCategory={setSelectedCategory}
-    />
-  )}
-   
-   keyExtractor={(items)=>items}
-    horizontal={true}
-    showsHorizontalScrollIndicator={false}
-   />
-        </>
-    }
-    data={products} 
-    renderItem={({item ,index}) => (
-        <ProductCard item={item} 
-        handleLiked={handleLiked} />
-    )} 
-    showsVerticalScrollIndicator={false}
-    keyExtractor={(item)=>item.id}
-    contentContainerStyle={{    
-        paddingBottom: 150,
-        
-    }}
-    />
-    
+    // Filter products based on search text
+    const filteredProducts = products.filter(item =>
+  (item.title || '').toLowerCase().includes(searchText.toLowerCase())
+);
 
-    
-</LinearGradient>
-  )
+    return (
+        <LinearGradient colors={['#FDF0F3', '#FFFBFC']} style={styles.container}>
+            <Header />
+            <FlatList
+                numColumns={2}
+                ListHeaderComponent={
+                    <>
+                        <Text style={styles.matchText}>Match Your Style</Text>
+                        {/* input container */}
+                        <View style={styles.inputContainer}>
+                            <View style={styles.iconContainer}>
+                                <Fontisto name="search" size={26} color="#C0C0C0" />
+                            </View>
+                            <TextInput
+                                style={styles.textInput}
+                                placeholder='Search'
+                                value={searchText}
+                                onChangeText={setSearchText}
+                            />
+                        </View>
+                        {/* Category Container */}
+                        <FlatList
+                            data={Categories}
+                            renderItem={({ item }) => (
+                                <Category
+                                    item={item}
+                                    selectedCategory={selectedCategory}
+                                    setSelectedCategory={setSelectedCategory}
+                                />
+                            )}
+                            keyExtractor={(items) => items}
+                            horizontal={true}
+                            showsHorizontalScrollIndicator={false}
+                        />
+                    </>
+                }
+                data={filteredProducts}
+                renderItem={({ item, index }) => (
+                    <ProductCard item={item} handleLiked={handleLiked} />
+                )}
+                showsVerticalScrollIndicator={false}
+                keyExtractor={(item) => item.id}
+                contentContainerStyle={{
+                    paddingBottom: 150,
+                }}
+            />
+        </LinearGradient>
+    )
 }
 
 export default HomeSreen;

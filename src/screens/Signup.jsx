@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Modal } from 'react-native';
 import React, { useState } from 'react';
-import { useNavigation } from '@react-navigation/native'; // Add this import
+import { useNavigation } from '@react-navigation/native';
 
 const Signup = () => {
   const [name, setName] = useState('');
@@ -8,15 +8,19 @@ const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const navigation = useNavigation(); // Add this line
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
+  const navigation = useNavigation();
 
   const handleSignup = async () => {
     if (!name || !phone || !email || !password || !confirmPassword) {
-      alert('Please fill all fields');
+      setPopupMessage('Please fill all fields');
+      setShowPopup(true);
       return;
     }
     if (password !== confirmPassword) {
-      alert('Passwords do not match');
+      setPopupMessage('Passwords do not match');
+      setShowPopup(true);
       return;
     }
 
@@ -38,14 +42,15 @@ const Signup = () => {
       const data = await response.json();
 
       if (response.ok) {
-        alert('Signup Successful!');
-        // Optionally navigate to login or home
-        navigation.navigate('Login');
+        setPopupMessage('Signup Successful!');
+        setShowPopup(true);
       } else {
-        alert(data.message || 'Signup failed');
+        setPopupMessage(data.message || 'Signup failed');
+        setShowPopup(true);
       }
     } catch (error) {
-      alert('An error occurred. Please try again.');
+      setPopupMessage('An error occurred. Please try again.');
+      setShowPopup(true);
     }
   };
 
@@ -99,6 +104,52 @@ const Signup = () => {
       <TouchableOpacity onPress={() => navigation.navigate('Login')}>
         <Text style={styles.loginText}>Already have an account? Login</Text>
       </TouchableOpacity>
+
+      {/* Popup Modal */}
+      <Modal
+        visible={showPopup}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowPopup(false)}
+      >
+        <View style={{
+          flex: 1,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
+          <View style={{
+            backgroundColor: '#fff',
+            borderRadius: 16,
+            padding: 30,
+            alignItems: 'center',
+            width: 300,
+          }}>
+            <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#E96E6E', marginBottom: 10 }}>
+              {popupMessage.includes('Successful') ? 'Success!' : 'Error'}
+            </Text>
+            <Text style={{ fontSize: 16, color: '#333', textAlign: 'center', marginBottom: 20 }}>
+              {popupMessage}
+            </Text>
+            <TouchableOpacity
+              style={{
+                backgroundColor: '#E96E6E',
+                paddingVertical: 10,
+                paddingHorizontal: 30,
+                borderRadius: 8,
+              }}
+              onPress={() => {
+                setShowPopup(false);
+                if (popupMessage === 'Signup Successful!') {
+                  navigation.navigate('Login');
+                }
+              }}
+            >
+              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };

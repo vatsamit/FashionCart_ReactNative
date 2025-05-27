@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Modal } from 'react-native';
 import React, { useState, useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../context/AuthContext';
@@ -6,12 +6,15 @@ import { AuthContext } from '../context/AuthContext';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
   const { login } = useContext(AuthContext);
   const navigation = useNavigation();
 
   const handleLogin = async () => {
     if (!email || !password) {
-      alert('Please enter email and password');
+      setPopupMessage('Please enter email and password');
+      setShowSuccess(true);
       return;
     }
     try {
@@ -22,13 +25,16 @@ const Login = () => {
       });
       const data = await response.json();
       if (response.ok) {
-        login(); // Set isLoggedIn to true in context
-        alert('Login Successful!');
+        setPopupMessage('Login Successful!');
+        setShowSuccess(true);
+        // Don't call login() yet
       } else {
-        alert(data.message || 'Login failed');
+        setPopupMessage(data.message || 'Login failed');
+        setShowSuccess(true);
       }
     } catch (error) {
-      alert('Network error');
+      setPopupMessage('Network error');
+      setShowSuccess(true);
     }
   };
 
@@ -59,6 +65,50 @@ const Login = () => {
       <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
         <Text style={styles.signupText}>Don't have an account? Sign Up</Text>
       </TouchableOpacity>
+      <Modal
+        visible={showSuccess}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowSuccess(false)}
+      >
+        <View style={{
+          flex: 1,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
+          <View style={{
+            backgroundColor: '#fff',
+            borderRadius: 16,
+            padding: 30,
+            alignItems: 'center',
+            width: 300,
+          }}>
+            <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#E96E6E', marginBottom: 10 }}>
+              {popupMessage.includes('Successful') ? 'Success!' : 'Error'}
+            </Text>
+            <Text style={{ fontSize: 16, color: '#333', textAlign: 'center', marginBottom: 20 }}>
+              {popupMessage}
+            </Text>
+            <TouchableOpacity
+              style={{
+                backgroundColor: '#E96E6E',
+                paddingVertical: 10,
+                paddingHorizontal: 30,
+                borderRadius: 8,
+              }}
+              onPress={() => {
+                setShowSuccess(false);
+                if (popupMessage === 'Login Successful!') {
+                  login();
+                }
+              }}
+            >
+              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
