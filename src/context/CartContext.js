@@ -55,12 +55,15 @@ export const CartProvider = ({ children }) => {
   setTotalPrice(0);
 };
 
+  const setCart = (items) => setCarts(items);
+
   const value = {
     carts,
     addToCart,
     totalPrice,
     deleteItemFromCart,
     clearCart,
+    setCart
   };
 
   return (

@@ -5,20 +5,37 @@ import Header from '../component/Header'
 import CardCart from '../component/CardCart'
 import { CartContext } from '../context/CartContext'
 import { useNavigation } from '@react-navigation/native'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CartScreen = () => {
-    const { carts ,totalPrice,deleteItemFromCart,clearCart} = useContext(CartContext);
+    const { carts ,deleteItemFromCart,clearCart} = useContext(CartContext);
 
     const navigation = useNavigation();
 
-    const handleCheckout = () => {
-        setTimeout(() => {
-          setShowSuccess(true);
-          
-        }, 1500);
+    const handleCheckout = async () => {
+      setTimeout(async () => {
+        setShowSuccess(true);
+        await saveOrder(carts, totalPrice); // <-- Save the order here
+        // clearCart(); // clear cart after saving order
+      }, 1500);
     };
 
       const [showSuccess, setShowSuccess] = React.useState(false);
+
+      const saveOrder = async () => {
+        const order = {
+          id: Date.now().toString(),
+          items: carts, // or whatever your cart items are
+          date: new Date().toISOString().split('T')[0],
+          total: totalPrice,
+        };
+        const existing = await AsyncStorage.getItem('orders');
+        let orders = existing ? JSON.parse(existing) : [];
+        orders.unshift(order); // add new order to the top
+        await AsyncStorage.setItem('orders', JSON.stringify(orders));
+      };
+
+      const totalPrice = carts.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
   return (
      <LinearGradient colors={['#FDF0F3', '#FFFBFC']} 
             style={styles.container}>

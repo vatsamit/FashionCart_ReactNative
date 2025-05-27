@@ -1,38 +1,44 @@
 import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity } from 'react-native';
-import React from 'react';
-
-const dummyOrders = [
-  {
-    id: '1',
-    title: 'Red T-Shirt',
-    date: '2024-05-01',
-    price: 299,
-    image: 'https://images.pexels.com/photos/428340/pexels-photo-428340.jpeg?auto=compress&w=100',
-  },
-  {
-    id: '2',
-    title: 'Blue Jeans',
-    date: '2024-04-15',
-    price: 799,
-    image: 'https://res.cloudinary.com/dlc5c1ycl/image/upload/v1710567612/qichw3wrcioebkvzudib.png',
-  },
-];
+import React, { useEffect, useState, useContext } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+import { CartContext } from '../context/CartContext'; // Adjust path if needed
 
 const ReorderScreen = () => {
+  const [orders, setOrders] = useState([]);
+  const navigation = useNavigation();
+  const { setCart } = useContext(CartContext);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      const stored = await AsyncStorage.getItem('orders');
+      if (stored) setOrders(JSON.parse(stored));
+    };
+    fetchOrders();
+  }, []);
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Your Past Orders</Text>
       <FlatList
-        data={dummyOrders}
+        data={orders}
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
           <View style={styles.card}>
-            <Image source={{ uri: item.image }} style={styles.image} />
+            <Image source={{ uri: item.items[0]?.image }} style={styles.image} />
             <View style={styles.info}>
-              <Text style={styles.title}>{item.title}</Text>
+              <Text style={styles.title}>
+                {item.items[0]?.title} {item.items.length > 1 ? `+${item.items.length - 1} more` : ''}
+              </Text>
               <Text style={styles.date}>Ordered on: {item.date}</Text>
-              <Text style={styles.price}>₹{item.price}</Text>
-              <TouchableOpacity style={styles.reorderBtn}>
+              <Text style={styles.price}>₹{item.total}</Text>
+              <TouchableOpacity
+                style={styles.reorderBtn}
+                onPress={() => {
+                  setCart(item.items); // Set cart to reordered items
+                  navigation.navigate('CART'); // Navigate to CartScreen
+                }}
+              >
                 <Text style={styles.reorderText}>Reorder</Text>
               </TouchableOpacity>
             </View>
