@@ -25,8 +25,8 @@ const CartScreen = () => {
       const saveOrder = async () => {
         const order = {
           id: Date.now().toString(),
-          items: carts, // or whatever your cart items are
-          date: new Date().toISOString().split('T')[0],
+          items: carts,
+          date: new Date().toISOString(), // Save full ISO string
           total: totalPrice,
         };
         const existing = await AsyncStorage.getItem('orders');

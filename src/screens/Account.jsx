@@ -1,7 +1,17 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
-import React from 'react';
+import React, { useContext } from 'react';
+import { AuthContext } from '../context/AuthContext'; // Adjust the import based on your folder structure
+import { useNavigation } from '@react-navigation/native';
 
 const Account = () => {
+  const { logout } = useContext(AuthContext);
+  const navigation = useNavigation();
+
+  const handleLogout = () => {
+    logout();
+    alert('You have been logged out successfully.');
+  };
+
   return (
     <View style={styles.container}>
       <Image
@@ -17,13 +27,16 @@ const Account = () => {
         <TouchableOpacity style={styles.optionBtn}>
           <Text style={styles.optionText}>Edit Profile</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.optionBtn}>
+        <TouchableOpacity
+          style={styles.optionBtn}
+          onPress={() => navigation.navigate('REORDER')}
+        >
           <Text style={styles.optionText}>Order History</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.optionBtn}>
           <Text style={styles.optionText}>Settings</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.optionBtn}>
+        <TouchableOpacity style={styles.optionBtn} onPress={handleLogout}>
           <Text style={[styles.optionText, { color: '#E96E6E' }]}>Logout</Text>
         </TouchableOpacity>
       </View>
