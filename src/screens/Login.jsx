@@ -2,13 +2,16 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, Modal } from 'reac
 import React, { useState, useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../context/AuthContext';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
-  const { login } = useContext(AuthContext);
+  const [loginToken, setLoginToken] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const { login, user } = useContext(AuthContext);
   const navigation = useNavigation();
 
   const handleLogin = async () => {
@@ -18,16 +21,17 @@ const Login = () => {
       return;
     }
     try {
-      const response = await fetch('https://backendformobileapp-7.onrender.com/api/auth/login', {
+      const response = await fetch('https://backendformobileapp-12.onrender.com/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
       const data = await response.json();
       if (response.ok) {
+        const token = data.token;
+        setLoginToken(token); // Save token in state
         setPopupMessage('Login Successful!');
         setShowSuccess(true);
-        // Don't call login() yet
       } else {
         setPopupMessage(data.message || 'Login failed');
         setShowSuccess(true);
@@ -51,14 +55,23 @@ const Login = () => {
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        placeholderTextColor="#888"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+      {/* Password Field with Eye Icon */}
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={[styles.input, { flex: 1, marginBottom: 0 }]}
+          placeholder="Password"
+          placeholderTextColor="#888"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!showPassword}
+        />
+        <TouchableOpacity
+          style={styles.eyeIcon}
+          onPress={() => setShowPassword(!showPassword)}
+        >
+          <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={22} color="#888" />
+        </TouchableOpacity>
+      </View>
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
@@ -100,7 +113,7 @@ const Login = () => {
               onPress={() => {
                 setShowSuccess(false);
                 if (popupMessage === 'Login Successful!') {
-                  login();
+                  login(loginToken); // Only call login here!
                 }
               }}
             >
@@ -109,6 +122,8 @@ const Login = () => {
           </View>
         </View>
       </Modal>
+      <Text style={styles.name}>{user?.name || ''}</Text>
+      <Text style={styles.email}>{user?.email || ''}</Text>
     </View>
   );
 };
@@ -146,6 +161,18 @@ const styles = StyleSheet.create({
     color: '#222',
     backgroundColor: '#FDF0F3',
   },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 18,
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 16,
+    padding: 4,
+    zIndex: 1,
+  },
   button: {
     width: '100%',
     backgroundColor: '#E96E6E',
@@ -163,5 +190,15 @@ const styles = StyleSheet.create({
     color: '#E96E6E',
     fontSize: 15,
     marginTop: 8,
+  },
+  name: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#222',
+    marginTop: 20,
+  },
+  email: {
+    fontSize: 16,
+    color: '#888',
   },
 });

@@ -14,6 +14,7 @@ import CartScreen from './src/screens/CartScreen';
 import Account from './src/screens/Account';
 import Login from './src/screens/Login';
 import Signup from './src/screens/Signup';
+import EditProfile from './src/screens/EditProfile';
 
 import { CartContext, CartProvider } from './src/context/CartContext';
 import { AuthProvider, AuthContext } from './src/context/AuthContext';
@@ -22,6 +23,7 @@ import ReorderScreen from './src/screens/ReorderScreen';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
+const RootStack = createNativeStackNavigator();
 
 const MyHomeStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -72,6 +74,58 @@ const AuthStackScreen = () => (
   </AuthStack.Navigator>
 );
 
+const RootNavigator = () => (
+  <RootStack.Navigator screenOptions={{ headerShown: false }}>
+    <RootStack.Screen name="MainTabs" component={TabNavigator} />
+    <RootStack.Screen name="EditProfile" component={EditProfile} />
+  </RootStack.Navigator>
+);
+
+const TabNavigator = () => (
+  <Tab.Navigator
+    screenOptions={{
+      headerShown: false,
+      tabBarShowLabel: false,
+      tabBarActiveTintColor: '#E96E6E',
+    }}
+  >
+    <Tab.Screen
+      name="HOME_STACK"
+      component={MyHomeStack}
+      options={{
+        tabBarIcon: ({ color, size }) => (
+          <Entypo name="home" size={size} color={color} />
+        ),
+      }}
+    />
+    <Tab.Screen
+      name="REORDER"
+      component={ReorderScreen}
+      options={{
+        tabBarIcon: ({ color, size }) => (
+          <MaterialIcons name="reorder" size={size} color={color} />
+        ),
+      }}
+    />
+    <Tab.Screen
+      name="CART"
+      component={CartScreen}
+      options={{
+        tabBarIcon: (props) => <CartIconWithBadge {...props} />,
+      }}
+    />
+    <Tab.Screen
+      name="ACCOUNT"
+      component={Account}
+      options={{
+        tabBarIcon: ({ color, size }) => (
+          <FontAwesome6 name="user" size={size} color={color} />
+        ),
+      }}
+    />
+  </Tab.Navigator>
+);
+
 const MainApp = () => {
   const { isLoggedIn, loading } = useContext(AuthContext);
 
@@ -84,52 +138,7 @@ const MainApp = () => {
 
   return (
     <NavigationContainer>
-      {isLoggedIn ? (
-        <Tab.Navigator
-          screenOptions={{
-            headerShown: false,
-            tabBarShowLabel: false,
-            tabBarActiveTintColor: '#E96E6E',
-          }}
-        >
-          <Tab.Screen
-            name="HOME_STACK"
-            component={MyHomeStack}
-            options={{
-              tabBarIcon: ({ color, size }) => (
-                <Entypo name="home" size={size} color={color} />
-              ),
-            }}
-          />
-          <Tab.Screen
-            name="REORDER"
-            component={ReorderScreen}
-            options={{
-              tabBarIcon: ({ color, size }) => (
-                <MaterialIcons name="reorder" size={size} color={color} />
-              ),
-            }}
-          />
-          <Tab.Screen
-            name="CART"
-            component={CartScreen}
-            options={{
-              tabBarIcon: (props) => <CartIconWithBadge {...props} />,
-            }}
-          />
-          <Tab.Screen
-            name="ACCOUNT"
-            component={Account}
-            options={{
-              tabBarIcon: ({ color, size }) => (
-                <FontAwesome6 name="user" size={size} color={color} />
-              ),
-            }}
-          />
-        </Tab.Navigator>
-      ) : (
-        <AuthStackScreen />
-      )}
+      {isLoggedIn ? <RootNavigator /> : <AuthStackScreen />}
     </NavigationContainer>
   );
 };

@@ -1,16 +1,25 @@
-import { StyleSheet, Text, View ,TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 
-const Category = ({item ,selectedCategory,setSelectedCategory}) => {
+const Category = ({ item, selectedCategory, setSelectedCategory, onPress }) => {
   return (
-    <TouchableOpacity onPress={() => setSelectedCategory(item)}>
-      <Text style={[styles.categoryText,
-      selectedCategory === item && {
-        color: '#FFFFFF',
-        backgroundColor: '#E96E6E',
-      }
-
-      ]}>{item}</Text>
+    <TouchableOpacity
+      onPress={() => {
+        setSelectedCategory(item);
+        if (onPress) onPress(item); // <-- Call the onPress prop if provided
+      }}
+    >
+      <Text
+        style={[
+          styles.categoryText,
+          selectedCategory === item && {
+            color: '#FFFFFF',
+            backgroundColor: '#E96E6E',
+          },
+        ]}
+      >
+        {item}
+      </Text>
     </TouchableOpacity>
   )
 }
